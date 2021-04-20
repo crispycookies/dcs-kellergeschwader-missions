@@ -1,11 +1,11 @@
 STEADFAST_COMMANDER = {
     ccRedAir = false,
-    ccRedAirMGRS = nil,
+    ccRedAirCoordinate = nil,
     ccRedSupport = false,
-    ccRedSupportMGRS = nil
+    ccRedSupportCoordinates = nil
 }
 
-local mgrsAccuracy = 2
+local commanderCorrdOffset = 100
 local redCommandGroupAirTemplates = {
     "RedCommandGroup_Air_Alert-1", "RedCommandGroup_Air_Alert-2",
     "RedCommandGroup_Air_Alert-3", "RedCommandGroup_Air_Alert-4",
@@ -19,29 +19,27 @@ local redCommandGroupSupportTemplates = {
 }
 
 local redCommandGroupAirSpawnZones = {
-    ZONE:New("RedCommandGroupAirSpawn-1"),
-    ZONE:New("RedCommandGroupAirSpawn-2"),
-    ZONE:New("RedCommandGroupAirSpawn-3"),
-    ZONE:New("RedCommandGroupAirSpawn-4"),
-    ZONE:New("RedCommandGroupAirSpawn-5"),
-    ZONE:New("RedCommandGroupAirSpawn-6"),
-    ZONE:New("RedCommandGroupAirSpawn-7"),
-    ZONE:New("RedCommandGroupAirSpawn-8"),
-    ZONE:New("RedCommandGroupAirSpawn-9"),
-    ZONE:New("RedCommandGroupAirSpawn-10"),
+    ZONE:New("RedCommandGroupAirSpawn-01"),
+    ZONE:New("RedCommandGroupAirSpawn-02"),
+    ZONE:New("RedCommandGroupAirSpawn-03"),
+    ZONE:New("RedCommandGroupAirSpawn-04"),
+    ZONE:New("RedCommandGroupAirSpawn-05"),
+    ZONE:New("RedCommandGroupAirSpawn-06"),
+    ZONE:New("RedCommandGroupAirSpawn-07"),
+    ZONE:New("RedCommandGroupAirSpawn-08"),
+    ZONE:New("RedCommandGroupAirSpawn-09"),
 }
 
 local redCommandGroupSupportSpawnZones = {
-    ZONE:New("RedCommandGroupSupportSpawn-1"),
-    ZONE:New("RedCommandGroupSupportSpawn-2"),
-    ZONE:New("RedCommandGroupSupportSpawn-3"),
-    ZONE:New("RedCommandGroupSupportSpawn-4"),
-    ZONE:New("RedCommandGroupSupportSpawn-5"),
-    ZONE:New("RedCommandGroupSupportSpawn-6"),
-    ZONE:New("RedCommandGroupSupportSpawn-7"),
-    ZONE:New("RedCommandGroupSupportSpawn-8"),
-    ZONE:New("RedCommandGroupSupportSpawn-9"),
-    ZONE:New("RedCommandGroupSupportSpawn-10"),
+    ZONE:New("RedCommandGroupSupportSpawn-01"),
+    ZONE:New("RedCommandGroupSupportSpawn-02"),
+    ZONE:New("RedCommandGroupSupportSpawn-03"),
+    ZONE:New("RedCommandGroupSupportSpawn-04"),
+    ZONE:New("RedCommandGroupSupportSpawn-05"),
+    ZONE:New("RedCommandGroupSupportSpawn-06"),
+    ZONE:New("RedCommandGroupSupportSpawn-07"),
+    ZONE:New("RedCommandGroupSupportSpawn-08"),
+    ZONE:New("RedCommandGroupSupportSpawn-09"),
 }
 
 local spawnCommandGroupAirAlert1 = SPAWN:New(redCommandGroupAirTemplates[1])
@@ -71,70 +69,61 @@ local startTimerSpawnAirCommander = nil
 local startTimerSpawnSupportCommander = nil
 
 
+-- Functions commander died event
+local function airCommanderDied()
+    trigger.action.outText("The enemy air commander has been destroyed.  They won't be committing any more aircraft to the attack, for the moment.", 15, false)
+    trigger.action.outSound("en_us_air_command_destroyed.ogg")
+    STEADFAST_COMMANDER.ccRedAir = false
+    STEADFAST_COMMANDER_MARKER:updateText()
+    startTimerSpawnAirCommander()
+end
+
+local function supportCommanderDied()
+    trigger.action.outText("The enemy support commander has been destroyed.  They won't be committing any more support vehicles to the attack or escalating the alert level further, for the moment.", 15, false)
+    trigger.action.outSound("en_us_ground_command_destroyed.ogg")
+    STEADFAST_COMMANDER.ccRedSupport = false
+
+    if supportArty == true then
+        zone1Arty:SpawnScheduleStop()
+        zone2Arty:SpawnScheduleStop()
+        zone3Arty:SpawnScheduleStop()
+    end
+
+    STEADFAST_COMMANDER_MARKER:updateText()
+    startTimerSpawnSupportCommander()
+end
+
+
 -- Write off the Red Air Command Center and stop helo/aircraft spawns once it's destroyed
 local checkRedAirCCDead = {}
-local redCommanderAirUnitNamePrefix = "RedCommandGroup_Air_Alert-"
-local redCommanderAirUnitNameSuffix = "4"
 local airCommandGroup = nil
+local airCommanderId = -1
 function checkRedAirCCDead:onEvent(event)
-    if airCommandGroup ~= nil and event.id == world.event.S_EVENT_DEAD and
-        STRING_HELPER.starts_with(event.initiator:getName(), redCommanderAirUnitNamePrefix) and
-        STRING_HELPER.ends_with(event.initiator:getName(), redCommanderAirUnitNameSuffix) then
-        local units = airCommandGroup:GetUnits()
-        local commanderKilled = false
+    if airCommandGroup ~= nil and
+        event.id == world.event.S_EVENT_DEAD and
+        event.initiator:getID() == airCommanderId then
 
-        for _, unit in pairs(units) do
-            if unit:GetID() == event.initiator:getID() then
-                commanderKilled = true
-            end
-        end
-
-        if commanderKilled == true then 
-            trigger.action.outText("The enemy air commander has been destroyed.  They won't be committing any more aircraft to the attack, for the moment.", 15, false)
-            trigger.action.outSound("en_us_air_command_destroyed.ogg")
-            STEADFAST_COMMANDER.ccRedAir = false
-            STEADFAST_COMMANDER_MARKER:updateText()
-            startTimerSpawnAirCommander()
-        end
+        airCommanderDied()
     end
 end
 world.addEventHandler(checkRedAirCCDead)
 
 -- Write off the Red Vehicle Command Center and stop support battery spawns once it's destroyed
 local checkRedSupportCCDead = {}
-local redCommanderSupportUnitNamePrefix = "RedCommandGroup_Support_Alert-"
-local redCommanderSupportUnitNameSuffix = "4"
 local supportCommandGroup = nil
+local supportCommanderId = -1
 function checkRedSupportCCDead:onEvent(event)
-    if supportCommandGroup ~= nil and event.id == world.event.S_EVENT_DEAD and
-        STRING_HELPER.starts_with(event.initiator:getName(), redCommanderSupportUnitNamePrefix) and
-        STRING_HELPER.ends_with(event.initiator:getName(), redCommanderSupportUnitNameSuffix) then
-        local units = supportCommandGroup:GetUnits()
-        local commanderKilled = false
+    if supportCommandGroup ~= nil and
+        event.id == world.event.S_EVENT_DEAD and
+        event.initiator:getID() == supportCommanderId then
 
-        for _, unit in pairs(units) do
-            if unit:GetID() == event.initiator:getID() then
-                commanderKilled = true
-            end
-        end
-
-        if commanderKilled == true then 
-            trigger.action.outText("The enemy support commander has been destroyed.  They won't be committing any more support vehicles to the attack or escalating the alert level further, for the moment.", 15, false)
-            trigger.action.outSound("en_us_ground_command_destroyed.ogg")
-            STEADFAST_COMMANDER.ccRedSupport = false
-
-            if supportArty == true then
-                zone1Arty:SpawnScheduleStop()
-                zone2Arty:SpawnScheduleStop()
-                zone3Arty:SpawnScheduleStop()
-            end
-
-            STEADFAST_COMMANDER_MARKER:updateText()
-            startTimerSpawnSupportCommander()
-        end
+        supportCommanderDied()
     end
 end
 world.addEventHandler(checkRedSupportCCDead)
+
+
+
 
 local function spawnAirCommanderGroup()
     if airCommandGroup ~= nil then
@@ -153,11 +142,15 @@ local function spawnAirCommanderGroup()
         airCommandGroup = spawnCommandGroupAirAlert5:Spawn()
     end
 
-    STEADFAST_COMMANDER.ccRedAirMGRS = airCommandGroup:GetCoordinate():ToStringMGRS({
-        MGRS_Accuracy = mgrsAccuracy
-    })
+    airCommanderId = airCommandGroup:GetUnit(4):GetID()
+
+    STEADFAST_COMMANDER.ccRedAirCoordinate = airCommandGroup
+        :GetCoordinate()
+        :GetRandomCoordinateInRadius(commanderCorrdOffset, 0)
+        :ToStringLLDDM()
+
     STEADFAST_COMMANDER.ccRedAir = true
-    trigger.action.outText("An enemy air commander has entered the battlefield.\nHe was seen at " .. STEADFAST_COMMANDER.ccRedAirMGRS .. ".", 15, false)
+    trigger.action.outText("An enemy air commander has entered the battlefield.\nHe was last seen around " .. STEADFAST_COMMANDER.ccRedAirCoordinate .. ".", 15, false)
     STEADFAST_COMMANDER_MARKER:updateText()
 end
 
@@ -178,11 +171,15 @@ local function spawnSupportCommanderGroup()
         supportCommandGroup = spawnCommandGroupSupportAlert5:Spawn()
     end
 
-    STEADFAST_COMMANDER.ccRedSupportMGRS = supportCommandGroup:GetCoordinate():ToStringMGRS({
-        MGRS_Accuracy = mgrsAccuracy
-    })
+    supportCommanderId = supportCommandGroup:GetUnit(4):GetID()
+
+    STEADFAST_COMMANDER.ccRedSupportCoordinates = supportCommandGroup
+        :GetCoordinate()
+        :GetRandomCoordinateInRadius(commanderCorrdOffset, 0)
+        :ToStringLLDDM()
+
     STEADFAST_COMMANDER.ccRedSupport = true
-    trigger.action.outText("An enemy support commander has entered the battlefield at\nHe was seen at " .. STEADFAST_COMMANDER.ccRedSupportMGRS .. ".", 15, false)
+    trigger.action.outText("An enemy support commander has entered the battlefield at\nHe was last seen around " .. STEADFAST_COMMANDER.ccRedSupportCoordinates .. ".", 15, false)
     STEADFAST_COMMANDER_MARKER:updateText()
 end
 

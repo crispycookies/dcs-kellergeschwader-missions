@@ -431,7 +431,7 @@ if zone3Status ~= zoneHeldRed then
 				elseif STEADFAST.alertLevel == 5 then
 				zone3Ground2_alert5:Spawn()
 				end
-			elseif zoneSelect == 3 then 
+			elseif zoneSelect == 3 then
 				if STEADFAST.alertLevel == 1 then
 				zone3Ground3_alert1:Spawn()
 				elseif STEADFAST.alertLevel == 2 then
@@ -443,7 +443,7 @@ if zone3Status ~= zoneHeldRed then
 				elseif STEADFAST.alertLevel == 5 then
 				zone3Ground3_alert5:Spawn()
 				end
-			elseif zoneSelect == 4 then 
+			elseif zoneSelect == 4 then
 				if STEADFAST.alertLevel == 1 then
 				zone3Ground4_alert1:Spawn()
 				elseif STEADFAST.alertLevel == 2 then
@@ -513,12 +513,12 @@ local reportIndividualRequest = individualRequest
 	end	
 	-- Determine if the command centers are still alive
 	if STEADFAST_COMMANDER.ccRedAir == true then
-		ccRedAirStatus = 'is currently active at ' .. STEADFAST_COMMANDER.ccRedAirMGRS
+		ccRedAirStatus = 'last seen around ' .. STEADFAST_COMMANDER.ccRedAirCoordinate
 		else
 		ccRedAirStatus = 'has been destroyed'
 	end
 	if STEADFAST_COMMANDER.ccRedSupport == true then
-		ccRedSupportStatus = 'is currently active at ' .. STEADFAST_COMMANDER.ccRedSupportMGRS
+		ccRedSupportStatus = 'last seen around ' .. STEADFAST_COMMANDER.ccRedSupportCoordinates
 		else
 		ccRedSupportStatus = 'has been destroyed'
 	end	

@@ -15,7 +15,7 @@ STEADFAST_COMMANDER_MARKER.updateText = function()
     local text = "Commander status"
     if redAirCommanderRespawnMinTime > -1 then
         if STEADFAST_COMMANDER.ccRedAir == true then
-            text = text .. "\nAir commander:         " .. STEADFAST_COMMANDER.ccRedAirMGRS
+            text = text .. "\nAir commander:         " .. STEADFAST_COMMANDER.ccRedAirCoordinate
         else
             text = text .. "\nAir commander: dead"
         end
@@ -23,7 +23,7 @@ STEADFAST_COMMANDER_MARKER.updateText = function()
 
     if redSupportCommanderRespawnMinTime > -1 then
         if STEADFAST_COMMANDER.ccRedSupport == true then
-            text = text .. "\nSupport commander: " .. STEADFAST_COMMANDER.ccRedSupportMGRS
+            text = text .. "\nSupport commander: " .. STEADFAST_COMMANDER.ccRedSupportCoordinates
         else
             text = text .. "\nSupport commander: dead"
         end
