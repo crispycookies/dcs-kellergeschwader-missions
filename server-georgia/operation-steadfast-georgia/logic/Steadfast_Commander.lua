@@ -100,6 +100,7 @@ local airCommandGroup = nil
 local airCommanderId = -1
 function checkRedAirCCDead:onEvent(event)
     if airCommandGroup ~= nil and
+        event.initiator ~= nil and
         event.id == world.event.S_EVENT_DEAD and
         event.initiator:getID() == airCommanderId then
 
@@ -114,6 +115,7 @@ local supportCommandGroup = nil
 local supportCommanderId = -1
 function checkRedSupportCCDead:onEvent(event)
     if supportCommandGroup ~= nil and
+        event.initiator ~= nil and
         event.id == world.event.S_EVENT_DEAD and
         event.initiator:getID() == supportCommanderId then
 
