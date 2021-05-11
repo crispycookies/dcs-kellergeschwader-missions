@@ -10,15 +10,15 @@ dofile(missionDir .. "logic\\Steadfast_Commander.lua")
 
 -- Set up the capture zones
 -- These need to match the zones in the Mission Editor where you want the fights happening
-CommandPost1 = ZONE:New( "Kaspi" )
-CommandPost2 = ZONE:New( "Gori" )
-CommandPost3 = ZONE:New( "Agara" )
+CommandPost1 = ZONE:New( "Zone1" )
+CommandPost2 = ZONE:New( "Zone2" )
+CommandPost3 = ZONE:New( "Zone3" )
 
 -- Name the zones
 -- Change these when porting between maps/regions
-zone1Name = 'KASPI (MM54, WP1)'
-zone2Name = 'GORI (MM24, WP2)'
-zone3Name = 'AGARA (MM05, WP3)'
+zone1Name = 'Zone1 (MM54, WP1)'
+zone2Name = 'Zone2 (MM24, WP2)'
+zone3Name = 'Zone3 (MM05, WP3)'
 
 -- Name the teams, e.g. US, Russia to match your theatre etc
 blueTeamName = 'NATO'
@@ -37,7 +37,7 @@ local zoneSecuringRed = "being secured by " .. redTeamName .. ".  Destroy their 
 local zoneSecuringBlue = "being secured by " .. blueTeamName .. ".  Clear any nearby enemies!"
 local zoneUnoccupied = "uncontrolled by either side.  Capture the position!"
 
--- Zone 1: Kaspi
+-- Zone 1
 CP1 = ZONE_CAPTURE_COALITION:New( CommandPost1, coalition.side.BLUE )
 CP1:__Guard( 1 )
 CP1:Mark()
@@ -103,7 +103,7 @@ CP1:Start( 300 , 30 )
 
 env.info('STEADFAST: Command Post 1 setup finished.')
 
--- Zone 2: Gori
+-- Zone 2
 CP2 = ZONE_CAPTURE_COALITION:New( CommandPost2, coalition.side.BLUE )
 CP2:__Guard( 1 )
 CP2:Mark()
@@ -169,7 +169,7 @@ CP2:Start( 300 , 30 )
  
 env.info('STEADFAST: Command Post 2 setup finished.')
 
--- Zone 3: Agara
+-- Zone 3
 CP3 = ZONE_CAPTURE_COALITION:New( CommandPost3, coalition.side.BLUE )
 CP3:__Guard( 1 )
 CP3:Mark()
