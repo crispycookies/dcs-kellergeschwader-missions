@@ -98,6 +98,7 @@ function checkRedAirCCDead:onEvent(event)
     if airCommandGroup ~= nil and
         event.initiator ~= nil and
         event.id == world.event.S_EVENT_DEAD and
+        event.initiator.getID ~= nil and
         event.initiator:getID() == airCommanderId then
 
         airCommanderDied()
@@ -113,6 +114,7 @@ function checkRedSupportCCDead:onEvent(event)
     if supportCommandGroup ~= nil and
         event.initiator ~= nil and
         event.id == world.event.S_EVENT_DEAD and
+        event.initiator.getID ~= nil and
         event.initiator:getID() == supportCommanderId then
 
         supportCommanderDied()
