@@ -11,3 +11,9 @@ function STRING_HELPER.starts_with(str, start)
    ending = tostring(ending)
    return ending == "" or string.sub(str, -string.len(ending)) == ending
  end
+
+ MOOSE_CONTROLLABLE_HELPER = {}
+
+ function MOOSE_CONTROLLABLE_HELPER.PassContext(controllable, functionToCall, context)
+  context[functionToCall](context)
+ end
