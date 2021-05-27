@@ -5,6 +5,7 @@ STEADFAST_COMMANDER = {
     ccRedSupportCoordinates = nil
 }
 
+local spawnHeading = 280
 local commanderCorrdOffset = 100
 local redCommandGroupAirTemplates = {
     "RedCommandGroup_Air_Alert-1", "RedCommandGroup_Air_Alert-2",
@@ -40,25 +41,34 @@ local redCommandGroupSupportSpawnZones = {
 
 local spawnCommandGroupAirAlert1 = SPAWN:New(redCommandGroupAirTemplates[1])
     :InitRandomizeZones(redCommandGroupAirSpawnZones)
+    :InitGroupHeading(spawnHeading)
 local spawnCommandGroupAirAlert2 = SPAWN:New(redCommandGroupAirTemplates[2])
     :InitRandomizeZones(redCommandGroupAirSpawnZones)
+    :InitGroupHeading(spawnHeading)
 local spawnCommandGroupAirAlert3 = SPAWN:New(redCommandGroupAirTemplates[3])
     :InitRandomizeZones(redCommandGroupAirSpawnZones)
+    :InitGroupHeading(spawnHeading)
 local spawnCommandGroupAirAlert4 = SPAWN:New(redCommandGroupAirTemplates[4])
     :InitRandomizeZones(redCommandGroupAirSpawnZones)
+    :InitGroupHeading(spawnHeading)
 local spawnCommandGroupAirAlert5 = SPAWN:New(redCommandGroupAirTemplates[5])
     :InitRandomizeZones(redCommandGroupAirSpawnZones)
+    :InitGroupHeading(spawnHeading)
 
 local spawnCommandGroupSupportAlert1 = SPAWN:New(redCommandGroupSupportTemplates[1])
     :InitRandomizeZones(redCommandGroupSupportSpawnZones)
+    :InitGroupHeading(spawnHeading)
 local spawnCommandGroupSupportAlert2 = SPAWN:New(redCommandGroupSupportTemplates[2])
     :InitRandomizeZones(redCommandGroupSupportSpawnZones)
 local spawnCommandGroupSupportAlert3 = SPAWN:New(redCommandGroupSupportTemplates[3])
     :InitRandomizeZones(redCommandGroupSupportSpawnZones)
+    :InitGroupHeading(spawnHeading)
 local spawnCommandGroupSupportAlert4 = SPAWN:New(redCommandGroupSupportTemplates[4])
     :InitRandomizeZones(redCommandGroupSupportSpawnZones)
+    :InitGroupHeading(spawnHeading)
 local spawnCommandGroupSupportAlert5 = SPAWN:New(redCommandGroupSupportTemplates[5])
     :InitRandomizeZones(redCommandGroupSupportSpawnZones)
+    :InitGroupHeading(spawnHeading)
 
 -- Will be initializised later. But need to be references before. Execution should only start after initialization
 local startTimerSpawnAirCommander = nil
