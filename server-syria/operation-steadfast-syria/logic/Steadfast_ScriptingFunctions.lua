@@ -16,9 +16,9 @@ CommandPost3 = ZONE:New( "Zone3" )
 
 -- Name the zones
 -- Change these when porting between maps/regions
-zone1Name = 'Zone1 (MM54, WP1)'
-zone2Name = 'Zone2 (MM24, WP2)'
-zone3Name = 'Zone3 (MM05, WP3)'
+zone1Name = 'Zone1 (YA49, WP1)'
+zone2Name = 'Zone2 (YB40, WP2)'
+zone3Name = 'Zone3 (YB41, WP3)'
 
 -- Name the teams, e.g. US, Russia to match your theatre etc
 blueTeamName = 'NATO'
