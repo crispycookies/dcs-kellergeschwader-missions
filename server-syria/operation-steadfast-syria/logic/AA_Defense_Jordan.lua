@@ -28,6 +28,8 @@ local a2aDispatcher = AI_A2A_DISPATCHER:New(detectionAreas)
 a2aDispatcher:SetEngageRadius(50000)
 
 local defendZone = ZONE:New("jordan-air-defend-zone")
+defendZone:DrawZone(-1, {1, 0, 0}, 1, {1, 0, 0}, 0.15, 2, true)
+
 a2aDispatcher:SetBorderZone(defendZone)
 a2aDispatcher:SetSquadron(squadron.name, squadron.airbase, squadron.templateNames)
 a2aDispatcher:SetSquadronOverhead(squadron.name, 1.5)
