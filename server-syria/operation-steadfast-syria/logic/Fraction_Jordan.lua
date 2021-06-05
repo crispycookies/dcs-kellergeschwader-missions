@@ -1,3 +1,7 @@
+FRACTION_JORDAN = {
+    isHot = false
+}
+
 local squadron = {
     name = "jordan-air-defenders",
     airbase = AIRBASE.Syria.King_Hussein_Air_College,
@@ -10,18 +14,16 @@ local ewrSpawn = SPAWN
         "jordan-ewr-preset-1"
     })
 
+local detectionGroup = SET_GROUP:New()
 for  _, zoneName in pairs({
     "jordan-air-defenders-ewr-spawn-1",
     "jordan-air-defenders-ewr-spawn-2",
     "jordan-air-defenders-ewr-spawn-3",
  }) do
     local zone = ZONE:New(zoneName)
-    ewrSpawn:SpawnInZone(zone)
+    local ewrGroup = ewrSpawn:SpawnInZone(zone)
+    detectionGroup:AddGroup(ewrGroup)
 end
-
-local detectionGroup = SET_GROUP:New()
-detectionGroup:FilterPrefixes({ "jordan-ewr" })
-detectionGroup:FilterStart()
 
 local detectionAreas = DETECTION_AREAS:New(detectionGroup, 100000)
 local a2aDispatcher = AI_A2A_DISPATCHER:New(detectionAreas)
@@ -40,4 +42,10 @@ local capZone = ZONE_POLYGON:New( "jordan-air-defend-cap-zone", GROUP:FindByName
 a2aDispatcher:SetSquadronCap(squadron.name, capZone, 4000, 8000, 400, 600, 800, 1200, "BARO")
 a2aDispatcher:SetSquadronCapInterval(squadron.name, 1, 180, 600)
 
-env.info("STEADFAST: AA_Defense_Jordan initialized")
+detectionGroup:HandleEvent(EVENTS.Dead, function()
+    detectionGroup:UnHandleEvent(EVENTS.Dead)
+    trigger.action.outText("Jordanian units were killed in the no-fly zone.\nJordan will increase its attack rate and strength.", 30, false)
+    FRACTION_JORDAN.isHot = true
+end)
+
+env.info("STEADFAST: Fraction_Jordan initialized")

@@ -2,10 +2,6 @@
 -- Delay before the mission starts (in seconds)
 missionPrepTime = 900
 
--- Mission victory conditions: 'wave', 'duration', or 'none' (for endless running), and either the amount of waves spawned, or time elapsed (in MINUTES) to win
-missionWinCondition = 'wave'
-missionSuccessAmount = 15
-
 -- Set the minimum and maximum random time between attacks on the zones (in seconds)
 zoneAttackTimeMin = 600
 zoneAttackTimeMax = 1200

@@ -5,8 +5,9 @@ STEADFAST = {
 	alertLevel = 1
 }
 
-dofile(missionDir .. "logic\\Steadfast_Commander_Marker.lua")
-dofile(missionDir .. "logic\\Steadfast_Commander.lua")
+dofile(missionDir .. "logic\\border-war\\Steadfast_SpawnDefs.lua")
+dofile(missionDir .. "logic\\border-war\\Steadfast_Commander_Marker.lua")
+dofile(missionDir .. "logic\\border-war\\Steadfast_Commander.lua")
 
 -- Set up the capture zones
 -- These need to match the zones in the Mission Editor where you want the fights happening
@@ -308,11 +309,6 @@ if zone1Status ~= zoneHeldRed then
 	if STEADFAST_COMMANDER.ccRedSupport == true and alertLevelType == 'wave' then
 		updateAlertLevel()
 	end
-	
-	if missionWinCondition == 'wave' then
-	timer.scheduleFunction(missionWinCheck, {}, timer.getTime() + 20)
-	end
-	
 else
 timer.setFunctionTime(runGenerator, timer.getTime() + 30)
 end
@@ -391,11 +387,6 @@ if zone2Status ~= zoneHeldRed then
 	if STEADFAST_COMMANDER.ccRedSupport == true and alertLevelType == 'wave' then
 		updateAlertLevel()
 	end
-	
-	if missionWinCondition == 'wave' then
-	timer.scheduleFunction(missionWinCheck, {}, timer.getTime() + 20)
-	end
-	
 else
 timer.setFunctionTime(runGenerator, timer.getTime() + 30)
 end
@@ -475,11 +466,6 @@ if zone3Status ~= zoneHeldRed then
 	if STEADFAST_COMMANDER.ccRedSupport == true and alertLevelType == 'wave' then
 		updateAlertLevel()
 	end
-	
-	if missionWinCondition == 'wave' then
-	timer.scheduleFunction(missionWinCheck, {}, timer.getTime() + 20)
-	end
-	
 else
 timer.setFunctionTime(runGenerator, timer.getTime() + 30)
 end
@@ -521,14 +507,21 @@ local reportIndividualRequest = individualRequest
 		ccRedSupportStatus = 'last seen around ' .. STEADFAST_COMMANDER.ccRedSupportCoordinates
 		else
 		ccRedSupportStatus = 'has been destroyed'
-	end	
-trigger.action.outText("MISSION STATUS REPORT:\n\nThe enemy is currently at Alert Level " .. STEADFAST.alertLevel .. "!\n\nEnemy buildup was most recently reported at " .. lastAttacked .. ".\n\nObjective " .. zone1Name .." is currently " .. zone1Status .."\nObjective " .. zone2Name .." is currently " .. zone2Status .."\nObjective " .. zone3Name .." is currently " .. zone3Status .."\n\nThe enemy air commander " .. ccRedAirStatus ..".\nThe enemy support commander " .. ccRedSupportStatus .. ".", 20 , false)
-trigger.action.outSound("en_us_situation_report.ogg")
-if missionStatusReportAutoDisplay == true and reportIndividualRequest == false then
-	runStatusReportGlobal = timer.scheduleFunction(missionStatusReportGlobal, false, timer.getTime() + missionStatusReportTime)
-	else
-end
-env.info('STEADFAST: Mission status report generated.')
+	end
+
+	local jordanHot = "cold"
+	if FRACTION_JORDAN.isHot == true then
+		jordanHot = "hot"
+	end
+
+	trigger.action.outText("MISSION STATUS REPORT:\n\nThe enemy is currently at Alert Level " .. STEADFAST.alertLevel .. "!\n\nEnemy buildup was most recently reported at " .. lastAttacked .. ".\n\nObjective " .. zone1Name .." is currently " .. zone1Status .."\nObjective " .. zone2Name .." is currently " .. zone2Status .."\nObjective " .. zone3Name .." is currently " .. zone3Status .."\n\nThe enemy air commander " .. ccRedAirStatus ..".\nThe enemy support commander " .. ccRedSupportStatus .. ".\n\nJordan is " .. jordanHot .. ".", 25 , false)
+	trigger.action.outSound("en_us_situation_report.ogg")
+
+	if missionStatusReportAutoDisplay == true and reportIndividualRequest == false then
+		runStatusReportGlobal = timer.scheduleFunction(missionStatusReportGlobal, false, timer.getTime() + missionStatusReportTime)
+		else
+	end
+	env.info('STEADFAST: Mission status report generated.')
 end
 
 
@@ -581,81 +574,34 @@ end
 
 -- Check every 60 seconds to see if the enemy holds all the objectives
 function missionFailCheck()
-if zone1Status == heldRed and zone2Status == heldRed and zone3Status == heldRed then
--- Cancel all the scheduled functions that keep the mission going
-timer.removeFunction(runGenerator)
-timer.removeFunction(restartGenerator)
-timer.removeFunction(runTroopRestock)
-timer.removeFunction(runStatusReportGlobal)
-timer.removeFunction(runMissionFailCheck)
-timer.removeFunction(runMissionWinLoop)
-timer.removeFunction(runAlertUpdater)
-
--- Cancel support asset spawns if they're still active
-if supportArty == true then
-	zone1Arty:SpawnScheduleStop()
-	zone2Arty:SpawnScheduleStop()
-	zone3Arty:SpawnScheduleStop()
-end
-
--- Stop MOOSE from checking the zone status since it's pointless now
-CP1:Stop()
-CP2:Stop()
-CP3:Stop()
-trigger.action.outText("The enemy has taken control of all the objectives.  This mission is a failure, return to base.\n\nYou managed to hold the enemy off for " .. wavesLaunched .. " attack waves!", 60 , false)
-trigger.action.outSound("en_us_mission_failed.ogg")
-else
--- Go for another status check in 60 seconds time
-runMissionFailCheck = timer.scheduleFunction(missionFailCheck, {}, timer.getTime() + 60)
-end
-env.info('STEADFAST: Routine check for mission failure conditions completed.')
-end
-
-
-function missionWinCheck()
-	if missionWinCondition == 'wave' then
-		if wavesLaunched == missionSuccessAmount then
-			trigger.action.outText("The enemy has launched their final attack wave.  See this last battle through, and the mission will be complete!\n\nIf we still have at least one zone secure 30 minutes from now, the mission is a victory!", 30 , false)
-			trigger.action.outSound("en_us_final_phase.ogg")		
-			timer.removeFunction(runGenerator)
-			timer.scheduleFunction(missionWinFinal, {}, timer.getTime() + 1800)
-			else
-			end
-	elseif missionWinCondition == 'duration' then
-		trigger.action.outText("The enemy has launched their final attack wave.  See this last battle through, and the mission will be complete!\n\nIf we still have at least one zone secure 30 minutes from now, the mission is a victory!", 30 , false)
-		trigger.action.outSound("en_us_final_phase.ogg")
+	if zone1Status == heldRed and zone2Status == heldRed and zone3Status == heldRed then
+		-- Cancel all the scheduled functions that keep the mission going
 		timer.removeFunction(runGenerator)
-		timer.scheduleFunction(missionWinFinal, {}, timer.getTime() + 1800)
+		timer.removeFunction(restartGenerator)
+		timer.removeFunction(runTroopRestock)
+		timer.removeFunction(runStatusReportGlobal)
+		timer.removeFunction(runMissionFailCheck)
+		timer.removeFunction(runMissionWinLoop)
+		timer.removeFunction(runAlertUpdater)
+
+		-- Cancel support asset spawns if they're still active
+		if supportArty == true then
+			zone1Arty:SpawnScheduleStop()
+			zone2Arty:SpawnScheduleStop()
+			zone3Arty:SpawnScheduleStop()
+		end
+
+		-- Stop MOOSE from checking the zone status since it's pointless now
+		CP1:Stop()
+		CP2:Stop()
+		CP3:Stop()
+		trigger.action.outText("The enemy has taken control of all the objectives.  This mission is a failure, return to base.\n\nYou managed to hold the enemy off for " .. wavesLaunched .. " attack waves!", 60 , false)
+		trigger.action.outSound("en_us_mission_failed.ogg")
+	else
+		-- Go for another status check in 60 seconds time
+		runMissionFailCheck = timer.scheduleFunction(missionFailCheck, {}, timer.getTime() + 60)
 	end
-env.info('STEADFAST: Check for mission win conditions completed.')
-end
-
-function missionWinFinal()
-runMissionWinLoop = timer.scheduleFunction(missionWinFinal, {}, timer.getTime() + 60)
-if zone1Status ~= zoneAttackedRed and zone2Status ~= zoneAttackedRed and zone3Status ~= zoneAttackedRed then
-trigger.action.outText("The enemy failed to take any ground with their final push.  We've managed to successfully defend our positions.  Excellent work, everyone!\n\nMission complete, return to base.\n\nWAVES SURVIVED: " .. wavesLaunched .. "\nALERT LEVEL REACHED: " .. STEADFAST.alertLevel .. "", 30 , false)
-trigger.action.outSound("en_us_mission_complete.ogg")
--- Cancel all the scheduled functions that keep the mission going
-timer.removeFunction(runTroopRestock)
-timer.removeFunction(runStatusReportGlobal)
-timer.removeFunction(runMissionFailCheck)
-timer.removeFunction(runMissionWinLoop)
-timer.removeFunction(runAlertUpdater)
-
--- Cancel support asset spawns if they're still active
-	if supportArty == true and STEADFAST_COMMANDER.ccRedSupport == true then
-	zone1Arty:SpawnScheduleStop()
-	zone2Arty:SpawnScheduleStop()
-	zone3Arty:SpawnScheduleStop()
-	end
--- Stop MOOSE from checking the zone status since it's pointless now
-CP1:Stop()
-CP2:Stop()
-CP3:Stop()
-
-else
-end
-env.info('STEADFAST: Mission end sequence complete.')
+	env.info('STEADFAST: Routine check for mission failure conditions completed.')
 end
 
 -- Warn about mission start 5mins prior
@@ -673,14 +619,6 @@ timer.scheduleFunction(missionFailCheck, {}, timer.getTime() + missionPrepTime)
 -- Start the zone status reports a few minutes after the first attack if the option is enabled
 if missionStatusReportAutoDisplay == true then
 timer.scheduleFunction(missionStatusReportGlobal, false, timer.getTime() + missionPrepTime + 120)
-else
-end
-
--- If the mission is set to be completed by time rather than waves, set the timer
-if missionWinCondition == 'duration' then
-timer.scheduleFunction(missionWinCheck, {}, timer.getTime() + missionPrepTime + (missionSuccessAmount * 60) )
--- elseif missionWinCondition == 'wave' then
--- timer.scheduleFunction(missionWinCheck, {}, timer.getTime() + missionPrepTime)
 else
 end
 
