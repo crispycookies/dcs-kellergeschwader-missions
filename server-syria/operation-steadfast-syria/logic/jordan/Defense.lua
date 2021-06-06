@@ -15,14 +15,33 @@ local ewrSpawn = SPAWN
     })
 
 local detectionGroup = SET_GROUP:New()
+local ewrGroups = {}
 for  _, zoneName in pairs({
     "jordan-air-defenders-ewr-spawn-1",
-    "jordan-air-defenders-ewr-spawn-2",
+    -- "jordan-air-defenders-ewr-spawn-2",
     "jordan-air-defenders-ewr-spawn-3",
  }) do
     local zone = ZONE:New(zoneName)
     local ewrGroup = ewrSpawn:SpawnInZone(zone)
     detectionGroup:AddGroup(ewrGroup)
+    ewrGroups[ewrGroup.GroupName] = ewrGroup
+end
+
+local eventHandler = EVENT:New()
+eventHandler:HandleEvent(EVENTS.Dead)
+function eventHandler:OnEventDead(eventdata)
+    if eventdata.IniGroup ~= nil then
+        local isSetEvent = ewrGroups[eventdata.IniGroup.GroupName] ~= nil
+
+        if isSetEvent == true and FRACTION_JORDAN.isHot == false then
+            eventHandler:UnHandleEvent(EVENTS.Dead)
+            eventHandler = nil
+            
+            trigger.action.outText("Jordanian units were killed in the no-fly zone.\nJordan will increase its attack rate and strength.", 30, false)
+            FRACTION_JORDAN.isHot = true
+            env.info("STEADFAST: Jordan hot")
+        end
+    end
 end
 
 local detectionAreas = DETECTION_AREAS:New(detectionGroup, 100000)
@@ -42,10 +61,9 @@ local capZone = ZONE_POLYGON:New( "jordan-air-defend-cap-zone", GROUP:FindByName
 a2aDispatcher:SetSquadronCap(squadron.name, capZone, 4000, 8000, 400, 600, 800, 1200, "BARO")
 a2aDispatcher:SetSquadronCapInterval(squadron.name, 1, 180, 600)
 
-detectionGroup:HandleEvent(EVENTS.Dead, function()
-    detectionGroup:UnHandleEvent(EVENTS.Dead)
-    trigger.action.outText("Jordanian units were killed in the no-fly zone.\nJordan will increase its attack rate and strength.", 30, false)
-    FRACTION_JORDAN.isHot = true
-end)
-
 env.info("STEADFAST: Fraction_Jordan initialized")
+
+JORDAN_DEFENSE = {}
+function JORDAN_DEFENSE:onEvent(event)
+end
+world.addEventHandler(JORDAN_DEFENSE)

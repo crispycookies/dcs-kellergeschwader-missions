@@ -490,7 +490,7 @@ env.info('STEADFAST: Random zone attack generation attempted.')
 end
 
 -- Update the players periodically with the status of the zones
-function missionStatusReportGlobal(individualRequest)
+function borderStatusReportGlobal(individualRequest)
 local reportIndividualRequest = individualRequest
 	-- In case someone asks for a status report before the battle begins
 	if lastAttacked == nil then
@@ -509,16 +509,11 @@ local reportIndividualRequest = individualRequest
 		ccRedSupportStatus = 'has been destroyed'
 	end
 
-	local jordanHot = "cold"
-	if FRACTION_JORDAN.isHot == true then
-		jordanHot = "hot"
-	end
-
-	trigger.action.outText("MISSION STATUS REPORT:\n\nThe enemy is currently at Alert Level " .. STEADFAST.alertLevel .. "!\n\nEnemy buildup was most recently reported at " .. lastAttacked .. ".\n\nObjective " .. zone1Name .." is currently " .. zone1Status .."\nObjective " .. zone2Name .." is currently " .. zone2Status .."\nObjective " .. zone3Name .." is currently " .. zone3Status .."\n\nThe enemy air commander " .. ccRedAirStatus ..".\nThe enemy support commander " .. ccRedSupportStatus .. ".\n\nJordan is " .. jordanHot .. ".", 25 , false)
+	trigger.action.outText("BORDER STATUS REPORT:\n\nThe enemy is currently at Alert Level " .. STEADFAST.alertLevel .. "!\n\nEnemy buildup was most recently reported at " .. lastAttacked .. ".\n\nObjective " .. zone1Name .." is currently " .. zone1Status .."\nObjective " .. zone2Name .." is currently " .. zone2Status .."\nObjective " .. zone3Name .." is currently " .. zone3Status .."\n\nThe enemy air commander " .. ccRedAirStatus ..".\nThe enemy support commander " .. ccRedSupportStatus .. ".", 25 , false)
 	trigger.action.outSound("en_us_situation_report.ogg")
 
 	if missionStatusReportAutoDisplay == true and reportIndividualRequest == false then
-		runStatusReportGlobal = timer.scheduleFunction(missionStatusReportGlobal, false, timer.getTime() + missionStatusReportTime)
+		runStatusReportGlobal = timer.scheduleFunction(borderStatusReportGlobal, false, timer.getTime() + missionStatusReportTime)
 		else
 	end
 	env.info('STEADFAST: Mission status report generated.')
@@ -618,7 +613,7 @@ timer.scheduleFunction(missionFailCheck, {}, timer.getTime() + missionPrepTime)
 
 -- Start the zone status reports a few minutes after the first attack if the option is enabled
 if missionStatusReportAutoDisplay == true then
-timer.scheduleFunction(missionStatusReportGlobal, false, timer.getTime() + missionPrepTime + 120)
+timer.scheduleFunction(borderStatusReportGlobal, false, timer.getTime() + missionPrepTime + 120)
 else
 end
 
@@ -628,7 +623,7 @@ end
 
 -- Create the intel submenus and commands
 -- local intelSubmenu = missionCommands.addSubMenu('Mission Intel', nil)
-missionCommands.addCommand('Mission Status Report', nil , missionStatusReportGlobal, true)
+missionCommands.addCommand('Border Status Report', nil , borderStatusReportGlobal, true)
 
 -- trigger.action.outText("DEBUG: Functions loaded.", 10 , false)
 
