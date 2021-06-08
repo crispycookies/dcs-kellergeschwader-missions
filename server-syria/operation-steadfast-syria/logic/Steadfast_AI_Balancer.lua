@@ -35,7 +35,7 @@ function AI_LIMIT_BALANCER:_checkClients()
             local group = self.spawn:Spawn()
             if group ~= nil then
                 self.activeGroupsCount = self.activeGroupsCount + 1
-                self.activeGroups = table.insert(self.activeGroups, group)
+                table.insert(self.activeGroups, group)
 
                 local _self = self
                 group:HandleEvent(EVENTS.Crash, function ()
@@ -52,32 +52,35 @@ function AI_LIMIT_BALANCER:_checkClients()
     end
 
 
-    for i = maxGroupCount, self.activeGroupsCount - 1, 1 do
-        local group = self.activeGroups[i]
-        self.activeGroupsCount =self.activeGroupsCount - 1
+    local n = maxGroupCount
+    for _, group in pairs(self.activeGroups) do
+        n = n - 1
+        if n < 0 then
+            self.activeGroupsCount = self.activeGroupsCount - 1
 
-        local destroy = function ()
-            group:Destroy(false)
-        end
+            local destroy = function ()
+                group:Destroy(false)
+            end
 
-        if group:InAir() == true then
-            group:RouteRTB(self.rtbBase)
-            group:HandleEvent(EVENTS.Crash, destroy)
-            group:HandleEvent(EVENTS.Dead, destroy)
-            group:HandleEvent(EVENTS.Ejection, destroy)
-            group:HandleEvent(EVENTS.EngineShutdown, destroy)
-            group:HandleEvent(EVENTS.Land, destroy)
-            group:HandleEvent(EVENTS.LandingAfterEjection, destroy)
-            group:HandleEvent(EVENTS.PilotDead, destroy)
-        else
-            destroy()
-        end
-        
+            if group:InAir() == true then
+                group:RouteRTB(self.rtbBase)
+                group:HandleEvent(EVENTS.Crash, destroy)
+                group:HandleEvent(EVENTS.Dead, destroy)
+                group:HandleEvent(EVENTS.Ejection, destroy)
+                group:HandleEvent(EVENTS.EngineShutdown, destroy)
+                group:HandleEvent(EVENTS.Land, destroy)
+                group:HandleEvent(EVENTS.LandingAfterEjection, destroy)
+                group:HandleEvent(EVENTS.PilotDead, destroy)
+            else
+                destroy()
+            end
+            
 
 
-        for i, v in pairs(self.activeGroups) do
-            if v == group then
-                self.activeGroups[i] = nil
+            for i, v in pairs(self.activeGroups) do
+                if v == group then
+                    self.activeGroups[i] = nil
+                end
             end
         end
     end

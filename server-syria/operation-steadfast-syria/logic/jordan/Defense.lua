@@ -18,7 +18,7 @@ local detectionGroup = SET_GROUP:New()
 local ewrGroups = {}
 for  _, zoneName in pairs({
     "jordan-air-defenders-ewr-spawn-1",
-    -- "jordan-air-defenders-ewr-spawn-2",
+    "jordan-air-defenders-ewr-spawn-2",
     "jordan-air-defenders-ewr-spawn-3",
  }) do
     local zone = ZONE:New(zoneName)

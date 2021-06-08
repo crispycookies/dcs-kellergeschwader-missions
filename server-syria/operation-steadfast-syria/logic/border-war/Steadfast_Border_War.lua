@@ -570,28 +570,9 @@ end
 -- Check every 60 seconds to see if the enemy holds all the objectives
 function missionFailCheck()
 	if zone1Status == heldRed and zone2Status == heldRed and zone3Status == heldRed then
-		-- Cancel all the scheduled functions that keep the mission going
-		timer.removeFunction(runGenerator)
-		timer.removeFunction(restartGenerator)
-		timer.removeFunction(runTroopRestock)
-		timer.removeFunction(runStatusReportGlobal)
-		timer.removeFunction(runMissionFailCheck)
-		timer.removeFunction(runMissionWinLoop)
-		timer.removeFunction(runAlertUpdater)
-
-		-- Cancel support asset spawns if they're still active
-		if supportArty == true then
-			zone1Arty:SpawnScheduleStop()
-			zone2Arty:SpawnScheduleStop()
-			zone3Arty:SpawnScheduleStop()
-		end
-
-		-- Stop MOOSE from checking the zone status since it's pointless now
-		CP1:Stop()
-		CP2:Stop()
-		CP3:Stop()
-		trigger.action.outText("The enemy has taken control of all the objectives.  This mission is a failure, return to base.\n\nYou managed to hold the enemy off for " .. wavesLaunched .. " attack waves!", 60 , false)
+		trigger.action.outText("The enemy has taken control of all the objectives.  This mission is a failure, return to base.", 60 , false)
 		trigger.action.outSound("en_us_mission_failed.ogg")
+        trigger.action.setUserFlag(1, 2)
 	else
 		-- Go for another status check in 60 seconds time
 		runMissionFailCheck = timer.scheduleFunction(missionFailCheck, {}, timer.getTime() + 60)
